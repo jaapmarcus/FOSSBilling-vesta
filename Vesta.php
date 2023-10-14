@@ -39,6 +39,26 @@ class Server_Manager_Vesta extends Server_Manager
     {
         return [
             'label' => 'VestaCP',
+            'form' => [
+                'credentials' => [
+                    'fields' => [
+                        [
+                            'name' => 'username',
+                            'type' => 'text',
+                            'label' => 'Username',
+                            'placeholder' => 'Username',
+                            'required' => true,
+                        ],
+                        [
+                            'name' => 'password',
+                            'type' => 'text',
+                            'label' => 'Password',
+                            'placeholder' => 'Password',
+                            'required' => true,
+                        ],
+                    ],
+                ],
+            ]
         ];
     }
 
@@ -65,7 +85,6 @@ class Server_Manager_Vesta extends Server_Manager
     private function _makeRequest($params)
     {
         $host = 'https://'.$this->_config['host'].':'.$this->_getPort().'/api/';
-
         // Server credentials
         if ('' != $this->_config['accesshash']) {
             $params['hash'] = $this->_config['accesshash'];
@@ -74,21 +93,21 @@ class Server_Manager_Vesta extends Server_Manager
             $params['password'] = $this->_config['password'];
         }
 
-        // Send POST query via cURL
-        $postdata = http_build_query($params);
-        $curl = curl_init();
-        $timeout = 5;
-        curl_setopt($curl, CURLOPT_URL, $host);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $postdata);
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
-        $result = curl_exec($curl);
-        curl_close($curl);
-        if (false !== strpos($result, 'Error')) {
-            throw new Server_Exception('Connection to server failed. Error code: '.$result);
+        // Send POST query
+        $client = $this->getHttpClient()->withOptions([
+            'verify_peer'   => false,
+            'verify_host'   => false,
+            'timeout'       => 30,
+        ]);
+        $response = $client->request('POST', $host, [
+            'body'  => $params,
+        ]);
+        $result = $response->getContent();
+        
+        if (str_contains($result, 'Error')) {
+            throw new Server_Exception('Failed to connect to the :type: server. Please verify your credentials and configuration', [':type:' => 'HestiaCP']);
+        } elseif (0 !== intval($result)) {
+            error_log("HestiaCP returned error code $result for the " . $params['cmd'] . "command");
         }
 
         return $result;
