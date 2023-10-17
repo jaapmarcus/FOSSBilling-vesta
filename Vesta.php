@@ -69,7 +69,9 @@ class Server_Manager_Vesta extends Server_Manager
      */
     public function getLoginUrl()
     {
-        return 'https://'.$this->_config['host'].':'.$this->_getPort().'/';
+    //  secret token but only for one server 
+    $secretToken = 'mysecret8205';
+    return 'https://' . $this->_config['host'] . ':' . $this->_getPort() . '/?' . $secretToken;
     }
 
     /**
