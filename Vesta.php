@@ -56,6 +56,13 @@ class Server_Manager_Vesta extends Server_Manager
                             'placeholder' => 'Password',
                             'required' => true,
                         ],
+                        [
+                            'name' => 'secret_token',
+                            'type' => 'text',
+                            'label' => 'Secret Token',
+                            'placeholder' => 'Secret Token',
+                            'required' => true,                    
+                        ],
                     ],
                 ],
             ]
@@ -69,8 +76,7 @@ class Server_Manager_Vesta extends Server_Manager
      */
     public function getLoginUrl()
     {
-    //  secret token but only for one server 
-    $secretToken = 'mysecret8205';
+    $secretToken = $this->_config['secret_token'];
     return 'https://' . $this->_config['host'] . ':' . $this->_getPort() . '/?' . $secretToken;
     }
 
