@@ -51,7 +51,7 @@ class Server_Manager_Vesta extends Server_Manager
                             'type' => 'text',
                             'label' => 'Password',
                             'placeholder' => 'Password',
-                            'required' => true,
+                            'required' => false,
                         ],
                         [
                             'name' => 'accesshash',
@@ -94,9 +94,9 @@ class Server_Manager_Vesta extends Server_Manager
     {
         $host = 'https://'.$this->_config['host'].':'.$this->_getPort().'/api/';
         // Server credentials
-        if ('' != $this->_config['accesshash']) {
-            $params['hash'] = $this->_config['accesshash'];
-        } else {
+        if(empty( $this->_config['password'])){
+            $params['hash']  = $this->_config['username'];
+        }else{
             $params['user'] = $this->_config['username'];
             $params['password'] = $this->_config['password'];
         }
