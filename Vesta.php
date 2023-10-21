@@ -20,9 +20,6 @@ class Server_Manager_Vesta extends Server_Manager
      */
     public function init()
     {
-        if (!extension_loaded('curl')) {
-            throw new Server_Exception('PHP cURL extension is not enabled');
-        }
     }
 
     public function _getPort()
@@ -56,6 +53,13 @@ class Server_Manager_Vesta extends Server_Manager
                             'placeholder' => 'Password',
                             'required' => true,
                         ],
+                        [
+                            'name' => 'accesshash',
+                            'type' => 'text',
+                            'label' => 'Secret Url',
+                            'placeholder' => 'Secret Url',
+                            'required' => false,
+                        ],
                     ],
                 ],
             ]
@@ -69,7 +73,11 @@ class Server_Manager_Vesta extends Server_Manager
      */
     public function getLoginUrl()
     {
-        return 'https://'.$this->_config['host'].':'.$this->_getPort().'/';
+        if(empty($this->_config['accesshash'])){
+            return 'https://'.$this->_config['host'].':'.$this->_getPort().'/';
+        }else{
+            return 'https://'.$this->_config['host'].':'.$this->_getPort().'/?'.$this->_config['accesshash'];
+        }
     }
 
     /**
@@ -207,7 +215,7 @@ class Server_Manager_Vesta extends Server_Manager
                 'arg2' => $a->getDomain(),
             ];
             $result2 = $this->_makeRequest($postvars2);
-            if ('0' !== $result2) {
+            if ( '0' != $result2) {
                 throw new Server_Exception('Server Manager Vesta CP Error: Create Domain failure! Error code: '.$result2);
             }
             return true;
