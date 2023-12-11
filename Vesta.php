@@ -71,7 +71,7 @@ class Server_Manager_Vesta extends Server_Manager
      *
      * @return string
      */
-    public function getLoginUrl()
+    public function getLoginUrl(null)
     {
         if(empty($this->_config['accesshash'])){
             return 'https://'.$this->_config['host'].':'.$this->_getPort().'/';
@@ -85,7 +85,7 @@ class Server_Manager_Vesta extends Server_Manager
      *
      * @return string
      */
-    public function getResellerLoginUrl()
+    public function getResellerLoginUrl(null)
     {
         return $this->getLoginUrl();
     }
